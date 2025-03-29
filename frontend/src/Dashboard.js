@@ -3,7 +3,7 @@ import { AuthContext } from "./context/AuthContext"; // Import AuthContext
 import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
-  const [message, setMessage] = useState("");
+  const [prescriptions, setPrescriptions] = useState([]);
   const { isAuthenticated } = useContext(AuthContext); // Get auth state
   const navigate = useNavigate();
 
@@ -13,7 +13,7 @@ const Dashboard = () => {
       return;
     }
 
-    fetch("http://localhost:5000/dashboard", {
+    fetch("/dashboard", {
       method: "GET",
       headers: {
         "Authorization": `Bearer ${localStorage.getItem("token")}`,
@@ -21,20 +21,35 @@ const Dashboard = () => {
       },
       credentials: "include"
     })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! Status: ${res.status}`);
-        }
-        return res.json();
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Prescriptions:", data.prescriptions);
+        setPrescriptions(data.prescriptions);
       })
-      .then((data) => setMessage(data.message))
       .catch((err) => console.error("Fetch error:", err));
   }, [isAuthenticated, navigate]);
 
   return (
-    <div>
+    <div className="dashboard-container">
       <h2>Dashboard</h2>
-      <p>{message}</p>
+      <h3>Your Prescriptions</h3>
+      <button onClick={() => navigate("/add-prescription")} className="btn-add">
+        Add Prescription
+      </button>
+      <div className="prescription-grid">
+        {prescriptions.length > 0 ? (
+          prescriptions.map((prescription) => (
+            <div key={prescription._id} className="prescription-card">
+              <h4>{prescription.name}</h4>
+              <p><strong>Duration:</strong> {prescription.duration} days</p>
+              <p><strong>Frequency:</strong> {prescription.frequency_per_day} times/day</p>
+              <p><strong>Last Taken:</strong> {new Date(prescription.last_taken).toLocaleString()}</p>
+            </div>
+          ))
+        ) : (
+          <p>No prescriptions found.</p>
+        )}
+      </div>
     </div>
   );
 };
