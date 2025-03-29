@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const AddPrescription = () => {
   const location = useLocation();
@@ -15,10 +15,10 @@ const AddPrescription = () => {
     last_taken: ""
   });
 
-  // ✅ Ensure we correctly receive the extracted data from the scan page
+  // ✅ Pre-fill form if redirected from ScanPrescription
   useEffect(() => {
     if (location.state && location.state.formData) {
-      console.log("✅ Received Data:", location.state.formData);
+      console.log("✅ Received Data from Scan:", location.state.formData);
       setFormData({ ...location.state.formData, last_taken: "" });
     }
   }, [location]);
@@ -32,37 +32,54 @@ const AddPrescription = () => {
     navigate("/scan-prescription", { state: { formData } });
   };
 
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post("/add-prescription", formData, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json"
+        },
+        credentials: "include"
+      });
+      navigate("/dashboard"); // Redirect back to Dashboard
+    } catch (error) {
+      alert("Error adding prescription.");
+      console.error(error);
+    }
+  };
+
   return (
     <div>
-      <h2>Add Prescription</h2>
-      <form>
+      <h2>Add New Prescription</h2>
+      <form onSubmit={handleSubmit} className="prescription-form">
         <label>Medication Name:</label>
-        <input type="text" name="name" value={formData.name} onChange={handleChange} />
+        <input type="text" name="name" value={formData.name} onChange={handleChange} required />
 
         <label>Dosage:</label>
-        <input type="text" name="dosage" value={formData.dosage} onChange={handleChange} />
+        <input type="text" name="dosage" value={formData.dosage} onChange={handleChange} required />
 
         <label>Frequency:</label>
-        <input type="text" name="frequency" value={formData.frequency} onChange={handleChange} />
+        <input type="text" name="frequency" value={formData.frequency} onChange={handleChange} required />
 
         <label>Quantity:</label>
-        <input type="text" name="quantity" value={formData.quantity} onChange={handleChange} />
+        <input type="number" name="quantity" value={formData.quantity} onChange={handleChange} required />
+
+        <label>Days to Take Medication:</label>
+        <input type="number" name="days" value={formData.days} onChange={handleChange} required />
 
         {formData.refills && (
           <>
             <label>Refills Remaining:</label>
-            <input type="text" name="refills" value={formData.refills} onChange={handleChange} />
+            <input type="number" name="refills" value={formData.refills} onChange={handleChange} />
           </>
         )}
 
-        <label>Days to Take Medication:</label>
-        <input type="text" name="days" value={formData.days} onChange={handleChange} />
-
         <label>Last Taken Date:</label>
-        <input type="date" name="last_taken" value={formData.last_taken} onChange={handleChange} />
-        
+        <input type="date" name="last_taken" value={formData.last_taken} onChange={handleChange} required />
         <button type="button" className="btn-scan" onClick={handleScan}>Scan</button>
-        <button type="submit">Submit</button>
+        <button type="submit" className="btn-submit">Submit</button>
       </form>
     </div>
   );

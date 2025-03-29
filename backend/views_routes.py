@@ -6,6 +6,7 @@ import os
 # import pytesseract
 from PIL import Image
 import re
+import datetime
 
 views_bp = Blueprint("views", __name__)
 
@@ -48,29 +49,115 @@ def update_medical_history():
 
     return jsonify({"message": "Medical history updated successfully"}), 200
 
-@views_bp.route('/add-prescription', methods=['POST'])
+@views_bp.route("/add-prescription", methods=["POST"])
 @jwt_required()
 def add_prescription():
-    data = request.json
-    current_user_email = get_jwt_identity()
+    """Adds a new prescription record to MongoDB."""
+    try:
+        data = request.json
+        current_user = get_jwt_identity()  # Get user ID from JWT token
 
-    user = users_collection.find_one({"email": current_user_email})
-    if not user:
-        return jsonify({"error": "User not found"}), 404
+        if not data:
+            return jsonify({"error": "No data received"}), 400
 
-    user_id = str(user["_id"])  # Convert user ID to string
+        # Ensure required fields exist
+        required_fields = ["name", "dosage", "frequency", "quantity", "days", "last_taken"]
+        for field in required_fields:
+            if field not in data or not data[field]:
+                return jsonify({"error": f"Missing field: {field}"}), 400
 
-    new_prescription = {
-        "user_id": user_id,
-        "name": data.get("name"),
-        "duration": int(data.get("duration")),
-        "frequency_per_day": int(data.get("frequency_per_day")),
-        "last_taken": data.get("last_taken")
-    }
+        # Create new prescription record
+        prescription = {
+            "user_id": current_user,  # Link prescription to user
+            "name": data["name"],
+            "dosage": data["dosage"],
+            "frequency": data["frequency"],
+            "quantity": int(data["quantity"]),
+            "days": int(data["days"]),
+            "last_taken": datetime.datetime.strptime(data["last_taken"], "%Y-%m-%d"),
+            "refills": int(data["refills"]) if "refills" in data else 0,  # Default to 0 if missing
+            "created_at": datetime.datetime.utcnow()
+        }
 
-    prescription_collection.insert_one(new_prescription)
+        # ✅ Insert into MongoDB
+        prescription_collection.insert_one(prescription)
 
-    return jsonify({"message": "Prescription added successfully"}), 201
+        return jsonify({"success": True, "message": "Prescription added successfully!"}), 201
+
+    except Exception as e:
+        print("\n🔥 ERROR LOG:", str(e))  # ✅ Print exact error
+        return jsonify({"error": f"Server error: {str(e)}"}), 500
+
+@views_bp.route("/get-prescriptions", methods=["GET"])
+@jwt_required()
+def get_prescriptions():
+    """Retrieve all prescriptions for the logged-in user, sorted by most recent."""
+    try:
+        current_user = get_jwt_identity()  # Get logged-in user's ID
+
+        # ✅ Fetch prescriptions for the user & sort by most recent (`created_at`)
+        prescriptions = prescription_collection.find(
+            {"user_id": current_user}
+        ).sort("created_at", -1)  # -1 sorts in descending order (most recent first)
+
+        # ✅ Convert MongoDB documents to JSON
+        prescriptions_list = []
+        for presc in prescriptions:
+            prescriptions_list.append({
+                "id": str(presc["_id"]),
+                "name": presc["name"],
+                "dosage": presc["dosage"],
+                "frequency": presc["frequency"],
+                "quantity": presc["quantity"],
+                "days": presc["days"],
+                "last_taken": presc["last_taken"].strftime("%Y-%m-%d"),
+                "refills": presc["refills"]
+            })
+
+        return jsonify({"success": True, "prescriptions": prescriptions_list}), 200
+
+    except Exception as e:
+        print("\n🔥 ERROR LOG:", str(e))  # ✅ Log errors
+        return jsonify({"error": f"Server error: {str(e)}"}), 500
+
+# @views_bp.route("/add-prescription", methods=["POST"])
+# @jwt_required()
+# def add_prescription():
+#     """Adds a new prescription record to MongoDB."""
+#     try:
+#         data = request.json
+#         current_user = get_jwt_identity()  # Get user ID from JWT token
+
+#         if not data:
+#             return jsonify({"error": "No data received"}), 400
+
+#         # Ensure required fields exist
+#         required_fields = ["name", "dosage", "frequency", "quantity", "days", "last_taken"]
+#         for field in required_fields:
+#             if field not in data or not data[field]:
+#                 return jsonify({"error": f"Missing field: {field}"}), 400
+
+#         # Create new prescription record
+#         prescription = {
+#             "user_id": current_user,  # Link prescription to user
+#             "name": data["name"],
+#             "dosage": data["dosage"],
+#             "frequency": data["frequency"],
+#             "quantity": int(data["quantity"]),
+#             "days": int(data["days"]),
+#             "last_taken": datetime.datetime.strptime(data["last_taken"], "%Y-%m-%d"),
+#             "refills": int(data["refills"]) if "refills" in data else 0,  # Default to 0 if missing
+#             "created_at": datetime.datetime.utcnow()
+#         }
+
+#         # ✅ Insert into MongoDB
+#         prescription_collection.insert_one(prescription)
+
+#         return jsonify({"success": True, "message": "Prescription added successfully!"}), 201
+
+#     except Exception as e:
+#         print("\n🔥 ERROR LOG:", str(e))  # ✅ Print exact error
+#         return jsonify({"error": f"Server error: {str(e)}"}), 500
 
 # @views_bp.route('/scan-prescription', methods=['POST'])
 # @jwt_required()
