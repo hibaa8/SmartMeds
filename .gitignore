@@ -6,3 +6,4 @@ frontend/node_modules
 
 backend/venv
 backend/__pycache__
+backend/google-vision-key.json

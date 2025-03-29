@@ -7,6 +7,7 @@ import os
 from PIL import Image
 import re
 import datetime
+from bson import ObjectId 
 
 views_bp = Blueprint("views", __name__)
 
@@ -119,6 +120,39 @@ def get_prescriptions():
     except Exception as e:
         print("\n🔥 ERROR LOG:", str(e))  # ✅ Log errors
         return jsonify({"error": f"Server error: {str(e)}"}), 500
+
+@views_bp.route("/delete-prescription/<string:prescription_id>", methods=["DELETE"])
+@jwt_required()
+def delete_prescription(prescription_id):
+    """Deletes a prescription from MongoDB."""
+    try:
+        
+        # ✅ Convert prescription_id to ObjectId
+        try:
+            valid_object_id = ObjectId(prescription_id)
+        except:
+            return jsonify({"error": "Invalid prescription ID"}), 400
+
+        # ✅ Ensure the prescription exists and belongs to the user
+        prescription = prescription_collection.find_one({"_id": valid_object_id})
+        if not prescription:
+            return jsonify({"error": "Prescription not found or does not belong to user"}), 404
+
+        # ✅ Delete the prescription
+        prescription_collection.delete_one({"_id": valid_object_id})
+
+        print("✅ Prescription deleted successfully!")
+        return jsonify({"success": True, "message": "Prescription deleted successfully!"}), 200
+
+    except Exception as e:
+        print("\n🔥 ERROR LOG:", str(e))
+        return jsonify({"error": f"Server error: {str(e)}"}), 500
+    
+@views_bp.route("/test-auth", methods=["GET"])
+@jwt_required()
+def test_auth():
+    user = get_jwt_identity()
+    return jsonify({"message": f"Authenticated as {user}"}), 200
 
 # @views_bp.route("/add-prescription", methods=["POST"])
 # @jwt_required()
