@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="512" height="512" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Leaf shape with three sections -->
-  <path d="M50 10 L80 50 L50 90 L20 50 Z" fill="#90C290"/>
-  <path d="M20 50 L50 10 L50 50 Z" fill="#2D572C"/>
-  <path d="M50 50 L50 90 L80 50 Z" fill="#458B44"/>
-</svg> 
