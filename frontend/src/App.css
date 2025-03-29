@@ -36,3 +36,20 @@
     transform: rotate(360deg);
   }
 }
+
+body {
+  background-color: #f7fafc; /* Light gray background for the app */
+  font-family: 'Inter', sans-serif; /* Modern, clean font */
+}
+
+a {
+  text-decoration: none; /* Removes default underline for links */
+}
+
+button {
+  cursor: pointer; /* Adds a pointer cursor for better UX */
+}
+
+button:hover {
+  opacity: 0.8; /* Smooth hover effect for buttons */
+}

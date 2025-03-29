@@ -14,29 +14,23 @@ import { AuthProvider } from "./context/AuthContext"; // Import AuthProvider
 function App() {
   const [auth, setAuth] = useState(!!localStorage.getItem("token"));
 
-  // useEffect(() => {
-  //   fetch("/members")  // ✅ Explicitly set Flask's URL
-  //     .then(res => res.json())
-  //     .then(data => {
-  //       console.log("Received JSON:", data);
-  //       setData(data);
-  //     })
-  //     .catch(err => console.error("Fetch error:", err));
-  // }, []);
   return (
     <AuthProvider>
-    <BrowserRouter>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login setAuth={setAuth} />} />
-        <Route path="/dashboard" element={<Dashboard auth={auth} setAuth={setAuth} />} />
-        <Route path="/medical-history" element={<MedicalHistory />} />
-        <Route path="/add-prescription" element={<AddPrescription />} /> 
-        <Route path="/scan-prescription" element={<ScanPrescription />} />
-      </Routes>
-    </BrowserRouter>
+      <BrowserRouter>
+        {/* Navbar component */}
+        <Navbar />
+        <div className="min-h-screen bg-gray-50">
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Login setAuth={setAuth} />} />
+            <Route path="/dashboard" element={<Dashboard auth={auth} setAuth={setAuth} />} />
+            <Route path="/medical-history" element={<MedicalHistory />} />
+            <Route path="/add-prescription" element={<AddPrescription />} />
+            <Route path="/scan-prescription" element={<ScanPrescription />} />
+          </Routes>
+        </div>
+      </BrowserRouter>
     </AuthProvider>
   );
 }
