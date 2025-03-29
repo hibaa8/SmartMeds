@@ -25,7 +25,7 @@ const ScanPrescription = () => {
     formData.append("image", image);
 
     try {
-      const response = await fetch("/scan-prescription", {
+      const response = await fetch("scan-prescription", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${localStorage.getItem("token")}`

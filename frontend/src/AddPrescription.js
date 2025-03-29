@@ -1,18 +1,27 @@
-import { useState, useContext } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "./context/AuthContext";
 
 const AddPrescription = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
-    duration: "",
-    frequency_per_day: "",
-    last_taken: "",
+    dosage: "",
+    frequency: "",
+    quantity: "",
+    refills: "",
+    days: "",
+    last_taken: ""
   });
 
-  const { isAuthenticated } = useContext(AuthContext);
-  const navigate = useNavigate();
+  // ✅ Ensure we correctly receive the extracted data from the scan page
+  useEffect(() => {
+    if (location.state && location.state.formData) {
+      console.log("✅ Received Data:", location.state.formData);
+      setFormData({ ...location.state.formData, last_taken: "" });
+    }
+  }, [location]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -23,31 +32,37 @@ const AddPrescription = () => {
     navigate("/scan-prescription", { state: { formData } });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post("/add-prescription", formData, {
-        headers: {
-          "Authorization": `Bearer ${localStorage.getItem("token")}`,
-        },
-        credentials: "include"
-      });
-      navigate("/dashboard"); // Redirect back to Dashboard
-    } catch (error) {
-      alert("Error adding prescription.");
-    }
-  };
-
   return (
     <div>
-      <h2>Add New Prescription</h2>
-      <form onSubmit={handleSubmit} className="prescription-form">
-        <input type="text" name="name" placeholder="Prescription Name" required onChange={handleChange} />
-        <input type="number" name="duration" placeholder="Duration (days)" required onChange={handleChange} />
-        <input type="number" name="frequency_per_day" placeholder="Frequency per day" required onChange={handleChange} />
-        <input type="datetime-local" name="last_taken" required onChange={handleChange} />
+      <h2>Add Prescription</h2>
+      <form>
+        <label>Medication Name:</label>
+        <input type="text" name="name" value={formData.name} onChange={handleChange} />
+
+        <label>Dosage:</label>
+        <input type="text" name="dosage" value={formData.dosage} onChange={handleChange} />
+
+        <label>Frequency:</label>
+        <input type="text" name="frequency" value={formData.frequency} onChange={handleChange} />
+
+        <label>Quantity:</label>
+        <input type="text" name="quantity" value={formData.quantity} onChange={handleChange} />
+
+        {formData.refills && (
+          <>
+            <label>Refills Remaining:</label>
+            <input type="text" name="refills" value={formData.refills} onChange={handleChange} />
+          </>
+        )}
+
+        <label>Days to Take Medication:</label>
+        <input type="text" name="days" value={formData.days} onChange={handleChange} />
+
+        <label>Last Taken Date:</label>
+        <input type="date" name="last_taken" value={formData.last_taken} onChange={handleChange} />
+        
         <button type="button" className="btn-scan" onClick={handleScan}>Scan</button>
-        <button type="submit" className="btn-submit">Submit</button>
+        <button type="submit">Submit</button>
       </form>
     </div>
   );

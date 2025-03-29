@@ -65,7 +65,6 @@ def add_prescription():
         "name": data.get("name"),
         "duration": int(data.get("duration")),
         "frequency_per_day": int(data.get("frequency_per_day")),
-        "frequency_per_day": int(data.get("frequency_per_day")),
         "last_taken": data.get("last_taken")
     }
 

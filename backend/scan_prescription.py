@@ -1,6 +1,6 @@
 import os
 import json
-import traceback  # ✅ Helps debug errors
+import traceback
 import google.generativeai as genai
 from google.cloud import vision
 from flask import Blueprint, request, jsonify
@@ -42,7 +42,8 @@ def clean_text_with_gemini(ocr_text):
     - dosage: (Just strength, e.g., "500 MG", remove words like "TABLET")
     - frequency: (How often to take it, e.g., "Twice daily")
     - quantity: (Total count, e.g., "30")
-    - refills: (Remaining refills, e.g., "2")
+    - refills: (Remaining refills, e.g., "2" or "0" if none)
+    - days: (Calculate how many days the user needs to take this medication: Days = Quantity / Frequency per day)
 
     Ensure the response is a valid JSON object and follows this format:
 
@@ -51,7 +52,8 @@ def clean_text_with_gemini(ocr_text):
       "dosage": "500 MG",
       "frequency": "Twice daily",
       "quantity": "30",
-      "refills": "2"
+      "refills": "2",
+      "days": "15"
     }}
     """
 
@@ -112,4 +114,3 @@ def scan_prescription():
     except Exception as e:
         print("\n🔥 ERROR LOG:", traceback.format_exc())  # ✅ Prints full traceback in console
         return jsonify({"error": f"Server error: {str(e)}"}), 500
-
