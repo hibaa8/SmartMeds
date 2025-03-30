@@ -17,7 +17,8 @@ Features
 - User-Friendly Dashboard: View and manage prescriptions easily.
 
 - Notification implemented (mostly complete)
-- 
+
+
 Tech Stack
 Frontend: React.js, Bootstrap
 Backend: Flask, Flask,, MongoDB
