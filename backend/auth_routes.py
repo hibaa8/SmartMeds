@@ -41,11 +41,14 @@ def login():
 @auth_bp.route('/logout', methods=['POST'])
 @jwt_required()
 def logout():
-    jti = get_jti(get_jwt_identity())  # Get token identifier
-    blacklisted_tokens.add(jti)  # Add to blacklist
-    return jsonify({"message": "Successfully logged out"}), 200
-
-
+    """Logs the user out by blacklisting their token and ending their session."""
+    try:
+        jti = get_jti(get_jwt_identity())  # Get token identifier
+        blacklisted_tokens.add(jti)  # Add token to blacklist
+        return jsonify({"message": "Successfully logged out"}), 200
+    except Exception as e:
+        return jsonify({"error": f"Logout failed: {str(e)}"}), 500
+    
 @auth_bp.route('/is_logged_in', methods=['GET'])
 @jwt_required()
 def is_logged_in():

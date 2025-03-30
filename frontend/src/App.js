@@ -15,8 +15,9 @@ function App() {
   const [auth, setAuth] = useState(!!localStorage.getItem("token"));
 
   return (
-    <AuthProvider>
+    
       <BrowserRouter>
+      <AuthProvider>
         {/* Navbar component */}
         <Navbar />
         <div className="min-h-screen bg-gray-50">
@@ -30,8 +31,9 @@ function App() {
             <Route path="/scan-prescription" element={<ScanPrescription />} />
           </Routes>
         </div>
+        </AuthProvider>
       </BrowserRouter>
-    </AuthProvider>
+    
   );
 }
 

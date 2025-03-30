@@ -1,40 +1,71 @@
-// src/components/Navbar.js
 import React, { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 const Navbar = () => {
   const { isAuthenticated, logout } = useContext(AuthContext);
+  const navigate = useNavigate(); // ✅ Import navigate
 
   const handleLogout = () => {
     logout();
+    navigate("/"); // ✅ Redirect immediately after logout
   };
 
   return (
-    <nav className="bg-green-700 text-white shadow-md p-4">
-      <div className="flex justify-between items-center container mx-auto">
-        <h1 className="text-3xl font-bold">
-          <Link to={isAuthenticated ? "/dashboard" : "/"}>Smart Med Assistant</Link>
-        </h1>
+    <nav className="navbar navbar-expand-lg navbar-dark bg-black shadow-sm fixed-top">
+      <div className="container">
+        {/* Logo */}
+        <Link className="navbar-brand text-light fw-bold fs-3" to={isAuthenticated ? "/dashboard" : "/"}>
+          Smart Med Assistant
+        </Link>
 
-        <div className="space-x-6">
-          {isAuthenticated ? (
-            <>
-              <Link to="/dashboard" className="hover:text-green-300 transition-all">Home</Link>
-              <button
-                onClick={handleLogout}
-                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-all"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <Link to="/" className="hover:text-green-300 transition-all">Home</Link>
-              <Link to="/login" className="hover:text-green-300 transition-all">Login</Link>
-              <Link to="/signup" className="hover:text-green-300 transition-all">Signup</Link>
-            </>
-          )}
+        {/* Mobile Toggle Button */}
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+
+        {/* Navbar Links */}
+        <div className="collapse navbar-collapse justify-content-end" id="navbarNav">
+          <ul className="navbar-nav">
+            {isAuthenticated ? (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link text-white fw-semibold" to="/dashboard">
+                    Dashboard
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <button
+                    className="btn btn-dark text-white px-3 py-2 fw-semibold"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </button>
+                </li>
+              </>
+            ) : (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link text-white fw-semibold" to="/login">
+                    Login
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="btn btn-dark text-white px-3 py-2 fw-semibold" to="/signup">
+                    Sign Up
+                  </Link>
+                </li>
+              </>
+            )}
+          </ul>
         </div>
       </div>
     </nav>

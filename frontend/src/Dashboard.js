@@ -1,288 +1,121 @@
-// import { useState, useEffect } from "react";
-// import { useNavigate } from "react-router-dom";
-// import axios from "axios";
-
-// const Dashboard = () => {
-//   const [prescriptions, setPrescriptions] = useState([]);
-//   const navigate = useNavigate();
-
-//   useEffect(() => {
-//     const fetchPrescriptions = async () => {
-//       try {
-//         const response = await axios.get("/get-prescriptions", {
-//           headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
-//         });
-
-//         if (response.data.success) {
-//           setPrescriptions(response.data.prescriptions);
-//         }
-//       } catch (error) {
-//         console.error("Error fetching prescriptions:", error);
-//       }
-//     };
-
-//     fetchPrescriptions();
-//   }, []);
-
-//   // const handleDelete = async (id) => {
-//   //   try {
-//   //     console.log(`Deleting prescription: ${id}`); // ✅ Debugging log
-//   //     const response = await axios.delete(`/delete-prescription/${id})}`, {
-//   //       headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` },
-//   //       withCredentials: true  // ✅ Ensures authentication cookies are included
-//   //     });
-
-//   //     if (response.data.success) {
-//   //       setPrescriptions(prescriptions.filter(p => p.id !== id));
-//   //     }
-//   //   } catch (error) {
-//   //     console.error("Error deleting prescription:", error);
-//   //   }
-//   // };
-//   const handleDelete = async (id) => {
-//     try {
-//       console.log(`Deleting prescription with ID: ${id}`); // ✅ Debugging log
-  
-//       const response = await axios.delete(`http://127.0.0.1:5000/delete-prescription/${id}`, {
-//         headers: {
-//           "Authorization": `Bearer ${localStorage.getItem("token")}`,
-//         },
-//         withCredentials: true,  // ✅ Ensures authentication cookies are included
-//       });
-  
-//       if (response.data.success) {
-//         console.log("✅ Prescription deleted successfully");
-//         setPrescriptions(prescriptions.filter(p => p.id !== id)); // ✅ Remove from UI
-//       }
-//     } catch (error) {
-//       console.error("Error deleting prescription:", error.response ? error.response.data : error.message);
-//     }
-//   };
-  
-
-//   return (
-//     <div className="dashboard-container">
-//       <h2>Your Prescriptions</h2>
-
-//       {/* ✅ Add Prescription Button */}
-//       <button onClick={() => navigate("/add-prescription")} className="btn-add">
-//         + Add Prescription
-//       </button>
-
-//       {prescriptions.length === 0 ? (
-//         <p>No prescriptions found.</p>
-//       ) : (
-//         <div className="prescription-list">
-//           {prescriptions.map((prescription) => (
-//             <div key={prescription.id} className="prescription-card">
-//               <h3>{prescription.name}</h3>
-//               <p><strong>Dosage:</strong> {prescription.dosage}</p>
-//               <p><strong>Frequency:</strong> {prescription.frequency}</p>
-//               <p><strong>Quantity:</strong> {prescription.quantity}</p>
-//               <p><strong>Days Remaining:</strong> {prescription.days}</p>
-//               <p><strong>Last Taken:</strong> {prescription.last_taken}</p>
-//               {prescription.refills > 0 && <p><strong>Refills Remaining:</strong> {prescription.refills}</p>}
-
-//               {/* ✅ Delete Button */}
-//               <button onClick={() => handleDelete(prescription.id)} className="btn-delete">
-//                 🗑 Delete
-//               </button>
-//             </div>
-//           ))}
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default Dashboard;
-
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
-
-// const Dashboard = () => {
-//   const [prescriptions, setPrescriptions] = useState([]);
-//   const [latestAnalysis, setLatestAnalysis] = useState(""); // ✅ Store Drug Interaction Warning
-//   const navigate = useNavigate();
-
-//   useEffect(() => {
-//     const fetchPrescriptions = async () => {
-//       try {
-//         const response = await axios.get("/get-prescriptions", {
-//           headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
-//         });
-
-//         if (response.data.success) {
-//           setPrescriptions(response.data.prescriptions);
-
-//           // ✅ Extract the latest drug interaction analysis
-//           if (response.data.prescriptions.length > 0) {
-//             setLatestAnalysis(response.data.prescriptions[0].analysis);
-//           }
-//         }
-//       } catch (error) {
-//         console.error("Error fetching prescriptions:", error);
-//       }
-//     };
-
-//     fetchPrescriptions();
-//   }, []);
-
-//   const handleDelete = async (id) => {
-//     try {
-//       console.log(`Deleting prescription with ID: ${id}`);
-
-//       const response = await axios.delete(`/delete-prescription/${id}`, {
-//         headers: {
-//           "Authorization": `Bearer ${localStorage.getItem("token")}`,
-//         },
-//         withCredentials: true
-//       });
-
-//       if (response.data.success) {
-//         setPrescriptions(prescriptions.filter(p => p.id !== id));
-//       }
-//     } catch (error) {
-//       console.error("Error deleting prescription:", error.response ? error.response.data : error.message);
-//     }
-//   };
-
-//   return (
-//     <div className="dashboard-container">
-//       <h2>Your Prescriptions</h2>
-
-//       {/* ✅ Show Drug Interaction Warning */}
-//       {latestAnalysis && (
-//         <div className="alert-warning">
-//           <strong>⚠ Drug Interaction Alert:</strong>
-//           <p>{latestAnalysis}</p>
-//         </div>
-//       )}
-
-//       {/* ✅ Add Prescription Button */}
-//       <button onClick={() => navigate("/add-prescription")} className="btn-add">
-//         + Add Prescription
-//       </button>
-
-//       {prescriptions.length === 0 ? (
-//         <p>No prescriptions found.</p>
-//       ) : (
-//         <div className="prescription-list">
-//           {prescriptions.map((prescription) => (
-//             <div key={prescription.id} className="prescription-card">
-//               <h3>{prescription.name}</h3>
-//               <p><strong>Dosage:</strong> {prescription.dosage}</p>
-//               <p><strong>Frequency:</strong> {prescription.frequency}</p>
-//               <p><strong>Quantity:</strong> {prescription.quantity}</p>
-//               <p><strong>Days Remaining:</strong> {prescription.days}</p>
-//               <p><strong>Last Taken:</strong> {prescription.last_taken}</p>
-//               {prescription.refills > 0 && <p><strong>Refills Remaining:</strong> {prescription.refills}</p>}
-
-//               {/* ✅ Delete Button */}
-//               <button onClick={() => handleDelete(prescription.id)} className="btn-delete">
-//                 🗑 Delete
-//               </button>
-//             </div>
-//           ))}
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default Dashboard;
+import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
+import axios from "axios"
 
 const Dashboard = () => {
-  const [prescriptions, setPrescriptions] = useState([]);
-  const [analysisMessage, setAnalysisMessage] = useState(""); // ✅ Store LLM analysis message
-  const navigate = useNavigate();
+  const [prescriptions, setPrescriptions] = useState([])
+  const [analysisMessage, setAnalysisMessage] = useState("")
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchPrescriptions = async () => {
       try {
         const response = await axios.get("/get-prescriptions", {
-          headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
-        });
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        })
 
         if (response.data.success) {
-          setPrescriptions(response.data.prescriptions);
+          setPrescriptions(response.data.prescriptions)
         }
       } catch (error) {
-        console.error("Error fetching prescriptions:", error);
+        console.error("Error fetching prescriptions:", error)
       }
-    };
-
-    fetchPrescriptions();
-
-    // ✅ Retrieve analysis message from localStorage (if available)
-    const savedAnalysis = localStorage.getItem("analysisMessage");
-    if (savedAnalysis) {
-      setAnalysisMessage(savedAnalysis);
-      localStorage.removeItem("analysisMessage"); // ✅ Clear message after first render
     }
-  }, []);
 
- 
+    fetchPrescriptions()
+
+    // Retrieve analysis message from localStorage (if available)
+    const savedAnalysis = localStorage.getItem("analysisMessage")
+    if (savedAnalysis) {
+      setAnalysisMessage(savedAnalysis)
+      localStorage.removeItem("analysisMessage") // Clear message after first render
+    }
+  }, [])
+
   const handleDelete = async (id) => {
     try {
-      console.log(`Deleting prescription with ID: ${id}`);
+      console.log(`Deleting prescription with ID: ${id}`)
 
       const response = await axios.delete(`/delete-prescription/${id}`, {
         headers: {
-          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        withCredentials: true
-      });
+        withCredentials: true,
+      })
 
       if (response.data.success) {
-        setPrescriptions(prescriptions.filter(p => p.id !== id));
+        setPrescriptions(prescriptions.filter((p) => p.id !== id))
       }
     } catch (error) {
-      console.error("Error deleting prescription:", error.response ? error.response.data : error.message);
+      console.error("Error deleting prescription:", error.response ? error.response.data : error.message)
     }
-  };
+  }
 
   return (
-    <div className="dashboard-container">
-      <h2>Your Prescriptions</h2>
+    <div className="container py-5">
+      <div className="card shadow-lg p-4 mx-auto" style={{ maxWidth: "800px" }}>
+        <h2 className="text-center text-dark fw-bold mb-4">Your Prescriptions</h2>
 
-      {/* ✅ Show AI Analysis Only After Submission (Disappear on Reload) */}
-      {analysisMessage && (
-        <div className="analysis-alert">
-          <strong>AI Drug Interaction Analysis:</strong> {analysisMessage}
+        {/* AI Analysis Alert */}
+        {analysisMessage && (
+          <div className="alert alert-info mb-4" role="alert">
+            <strong>AI Drug Interaction Analysis:</strong> {analysisMessage}
+          </div>
+        )}
+
+        {/* Add Prescription Button */}
+        <div className="d-flex justify-content-end mb-4">
+          <button onClick={() => navigate("/add-prescription")} className="btn btn-dark fw-semibold">
+            + Add Prescription
+          </button>
         </div>
-      )}
 
-      {/* ✅ Add Prescription Button */}
-      <button onClick={() => navigate("/add-prescription")} className="btn-add">
-        + Add Prescription
-      </button>
-
-      {prescriptions.length === 0 ? (
-        <p>No prescriptions found.</p>
-      ) : (
-        <div className="prescription-list">
-          {prescriptions.map((prescription) => (
-            <div key={prescription.id} className="prescription-card">
-              <h3>{prescription.name}</h3>
-              <p><strong>Dosage:</strong> {prescription.dosage}</p>
-              <p><strong>Frequency:</strong> {prescription.frequency}</p>
-              <p><strong>Quantity:</strong> {prescription.quantity}</p>
-              <p><strong>Days Remaining:</strong> {prescription.days}</p>
-              <p><strong>Last Taken:</strong> {prescription.last_taken}</p>
-              {prescription.refills > 0 && <p><strong>Refills Remaining:</strong> {prescription.refills}</p>}
-
-              {/* ✅ Delete Button */}
-              <button onClick={() => handleDelete(prescription.id)} className="btn-delete">
-                🗑 Delete
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+        {prescriptions.length === 0 ? (
+          <p className="text-center text-muted">No prescriptions found.</p>
+        ) : (
+          <div className="row g-4">
+            {prescriptions.map((prescription) => (
+              <div key={prescription.id} className="col-md-6">
+                <div className="card h-100 shadow-sm">
+                  <div className="card-body">
+                    <h3 className="card-title fw-bold">{prescription.name}</h3>
+                    <div className="card-text">
+                      <p>
+                        <strong>Dosage:</strong> {prescription.dosage}
+                      </p>
+                      <p>
+                        <strong>Frequency:</strong> {prescription.frequency}
+                      </p>
+                      <p>
+                        <strong>Quantity:</strong> {prescription.quantity}
+                      </p>
+                      <p>
+                        <strong>Days Remaining:</strong> {prescription.days}
+                      </p>
+                      <p>
+                        <strong>Last Taken:</strong> {prescription.last_taken}
+                      </p>
+                      {prescription.refills > 0 && (
+                        <p>
+                          <strong>Refills Remaining:</strong> {prescription.refills}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="card-footer bg-white border-top-0 d-flex justify-content-end">
+                    <button onClick={() => handleDelete(prescription.id)} className="btn btn-outline-danger">
+                      🗑 Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
-  );
-};
+  )
+}
 
-export default Dashboard;
+export default Dashboard
+
