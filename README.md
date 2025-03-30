@@ -29,7 +29,7 @@ Installation & Setup
 
 1. Clone the Repository
 ```
-git clone https://github.com/your-username/smart-med-assistant.git
+git clone https://github.com/hibaa8/SmartMeds.git
 cd smart-med-assistant
 ```
 
