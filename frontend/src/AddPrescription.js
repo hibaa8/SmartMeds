@@ -33,20 +33,44 @@ const AddPrescription = () => {
   };
 
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     await axios.post("/add-prescription", formData, {
+  //       headers: {
+  //         "Authorization": `Bearer ${localStorage.getItem("token")}`,
+  //         "Content-Type": "application/json"
+  //       },
+  //       credentials: "include"
+  //     });
+  //     navigate("/dashboard"); // Redirect back to Dashboard
+  //   } catch (error) {
+  //     alert("Error adding prescription.");
+  //     console.error(error);
+  //   }
+  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("/add-prescription", formData, {
+      const response = await axios.post("/add-prescription", formData, {
         headers: {
           "Authorization": `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "application/json"
         },
-        credentials: "include"
       });
-      navigate("/dashboard"); // Redirect back to Dashboard
+
+      if (response.data.success) {
+        console.log("✅ Prescription Added:", response.data);
+        
+        // ✅ Store analysis message in localStorage
+        if (response.data.analysis) {
+          localStorage.setItem("analysisMessage", response.data.analysis);
+        }
+
+        navigate("/dashboard"); // ✅ Redirect to Dashboard
+      }
     } catch (error) {
+      console.error("Error adding prescription:", error);
       alert("Error adding prescription.");
-      console.error(error);
     }
   };
 

@@ -94,7 +94,7 @@ def analyze_drug_interactions(new_prescription, existing_prescriptions):
 def add_prescription():
     try:
         data = request.json
-        current_user = get_jwt_identity()  # Get user email
+        current_user = get_jwt_identity()
 
         if not data:
             return jsonify({"error": "No data received"}), 400
@@ -102,15 +102,15 @@ def add_prescription():
         required_fields = ["name", "dosage", "frequency", "quantity", "days", "last_taken"]
         for field in required_fields:
             if field not in data or data[field] == "":
-                return jsonify({"error": f"Missing or empty field: {field}"}), 400  # ✅ Clearer error message
+                return jsonify({"error": f"Missing or empty field: {field}"}), 400  
 
         # ✅ Ensure integer conversion is safe
         try:
-            quantity = int(data["quantity"]) if data["quantity"].isdigit() else 0  # ✅ Defaults to 0 if invalid
-            days = int(data["days"]) if data["days"].isdigit() else 0  # ✅ Defaults to 0 if invalid
-            refills = int(data["refills"]) if "refills" in data and data["refills"].isdigit() else 0  # ✅ Defaults to 0 if invalid
+            quantity = int(data["quantity"]) if data["quantity"].isdigit() else 0
+            days = int(data["days"]) if data["days"].isdigit() else 0
+            refills = int(data["refills"]) if "refills" in data and data["refills"].isdigit() else 0
         except ValueError:
-            return jsonify({"error": "Invalid number format for quantity, days, or refills"}), 400  # ✅ More specific error message
+            return jsonify({"error": "Invalid number format for quantity, days, or refills"}), 400  
 
         # ✅ Fetch existing prescriptions for this user
         existing_prescriptions = list(prescription_collection.find({"user_id": current_user}))
@@ -119,7 +119,7 @@ def add_prescription():
         analysis_response = analyze_drug_interactions(data, existing_prescriptions)
         print(f'🔹 Analysis Result: {analysis_response}')
 
-        # **Extract text from TxGemma response**
+        # **Extract text from AI response**
         ai_analysis = "No analysis available."
         try:
             if analysis_response:
@@ -133,22 +133,84 @@ def add_prescription():
             "name": data["name"],
             "dosage": data["dosage"],
             "frequency": data["frequency"],
-            "quantity": quantity,  # ✅ Now guaranteed to be an integer
-            "days": days,  # ✅ Now guaranteed to be an integer
+            "quantity": quantity,  
+            "days": days,  
             "last_taken": datetime.datetime.strptime(data["last_taken"], "%Y-%m-%d"),
-            "refills": refills,  # ✅ Now guaranteed to be an integer
+            "refills": refills,  
             "created_at": datetime.datetime.utcnow(),
-            "analysis": ai_analysis  # ✅ Only storing **text**
+            "analysis": ai_analysis  
         }
 
         # ✅ Insert into MongoDB
         prescription_collection.insert_one(prescription)
 
+        # ✅ Return analysis message in the response
         return jsonify({"success": True, "message": "Prescription added successfully!", "analysis": ai_analysis}), 201
 
     except Exception as e:
         print("\n🔥 ERROR LOG:", str(e))
         return jsonify({"error": f"Server error: {str(e)}"}), 500
+
+# @views_bp.route("/add-prescription", methods=["POST"])
+# @jwt_required()
+# def add_prescription():
+#     try:
+#         data = request.json
+#         current_user = get_jwt_identity()  # Get user email
+
+#         if not data:
+#             return jsonify({"error": "No data received"}), 400
+
+#         required_fields = ["name", "dosage", "frequency", "quantity", "days", "last_taken"]
+#         for field in required_fields:
+#             if field not in data or data[field] == "":
+#                 return jsonify({"error": f"Missing or empty field: {field}"}), 400  # ✅ Clearer error message
+
+#         # ✅ Ensure integer conversion is safe
+#         try:
+#             quantity = int(data["quantity"]) if data["quantity"].isdigit() else 0  # ✅ Defaults to 0 if invalid
+#             days = int(data["days"]) if data["days"].isdigit() else 0  # ✅ Defaults to 0 if invalid
+#             refills = int(data["refills"]) if "refills" in data and data["refills"].isdigit() else 0  # ✅ Defaults to 0 if invalid
+#         except ValueError:
+#             return jsonify({"error": "Invalid number format for quantity, days, or refills"}), 400  # ✅ More specific error message
+
+#         # ✅ Fetch existing prescriptions for this user
+#         existing_prescriptions = list(prescription_collection.find({"user_id": current_user}))
+
+#         # ✅ Analyze Drug Interactions with TxGemma
+#         analysis_response = analyze_drug_interactions(data, existing_prescriptions)
+#         print(f'🔹 Analysis Result: {analysis_response}')
+
+#         # **Extract text from TxGemma response**
+#         ai_analysis = "No analysis available."
+#         try:
+#             if analysis_response:
+#                 ai_analysis = analysis_response.strip()
+#         except Exception as e:
+#             print("\n🔥 Error extracting AI analysis:", str(e))
+
+#         # ✅ Create new prescription record
+#         prescription = {
+#             "user_id": current_user,  
+#             "name": data["name"],
+#             "dosage": data["dosage"],
+#             "frequency": data["frequency"],
+#             "quantity": quantity,  # ✅ Now guaranteed to be an integer
+#             "days": days,  # ✅ Now guaranteed to be an integer
+#             "last_taken": datetime.datetime.strptime(data["last_taken"], "%Y-%m-%d"),
+#             "refills": refills,  # ✅ Now guaranteed to be an integer
+#             "created_at": datetime.datetime.utcnow(),
+#             "analysis": ai_analysis  # ✅ Only storing **text**
+#         }
+
+#         # ✅ Insert into MongoDB
+#         prescription_collection.insert_one(prescription)
+
+#         return jsonify({"success": True, "message": "Prescription added successfully!", "analysis": ai_analysis}), 201
+
+#     except Exception as e:
+#         print("\n🔥 ERROR LOG:", str(e))
+#         return jsonify({"error": f"Server error: {str(e)}"}), 500
 
 
 # @views_bp.route("/add-prescription", methods=["POST"])
