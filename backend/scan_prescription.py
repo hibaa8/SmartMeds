@@ -5,16 +5,16 @@ import google.generativeai as genai
 from google.cloud import vision
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
+import os
+load_dotenv()
 
 scan_bp = Blueprint("scan", __name__)
 
-# ✅ Set up API Keys
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "google-vision-key.json"
-GEMINI_API_KEY = "AIzaSyC_yfg1Fka60YKC3oLk3TNkoKC5iNmX7Ik"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getenv("GOOGLE_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 
 def extract_text_from_image(image_path):
-    """Uses Google Vision API to extract text from an image."""
     client = vision.ImageAnnotatorClient()
 
     with open(image_path, "rb") as image_file:
@@ -30,7 +30,6 @@ def extract_text_from_image(image_path):
     return extracted_text
 
 def clean_text_with_gemini(ocr_text):
-    """Uses Gemini to clean and extract structured medication details."""
     prompt = f"""
     Extract structured prescription details from the following OCR text. Ignore irrelevant text like image credits.
 
@@ -61,16 +60,9 @@ def clean_text_with_gemini(ocr_text):
         model = genai.GenerativeModel("gemini-2.0-flash")
         response = model.generate_content(prompt)
 
-        # ✅ Log raw response
         print("\n🔹 Raw LLM Response:\n", response.text)
-
-        # Ensure valid JSON response
-        structured_data = response.text.strip("```json").strip("```").strip()  # Remove markdown formatting if present
-
-        # Convert to dictionary
+        structured_data = response.text.strip("```json").strip("```").strip() 
         structured_data = json.loads(structured_data)
-
-        # Post-processing: Cleanup dosage field (remove words like "TABLET")
         if "dosage" in structured_data:
             structured_data["dosage"] = structured_data["dosage"].replace("TABLET", "").strip()
 
@@ -79,7 +71,7 @@ def clean_text_with_gemini(ocr_text):
     except json.JSONDecodeError:
         return {"error": "Gemini returned non-JSON data."}
     except Exception as e:
-        print("\n🔥 Gemini API Error:", traceback.format_exc())  # ✅ Logs the full error trace
+        print("\n🔥 Gemini API Error:", traceback.format_exc()) 
         return {"error": f"Gemini API Error: {str(e)}"}
 
 @scan_bp.route('/scan-prescription', methods=['POST'])
@@ -97,13 +89,13 @@ def scan_prescription():
     image.save(temp_path)
 
     try:
-        # Extract text using Google Vision API
+
         extracted_text = extract_text_from_image(temp_path)
         os.remove(temp_path)
 
         print("\n📌 Extracted Text from Image:\n", extracted_text)
 
-        # Use Gemini AI to clean and structure prescription data
+       
         structured_data = clean_text_with_gemini(extracted_text)
 
         if "error" in structured_data:
@@ -112,5 +104,5 @@ def scan_prescription():
         return jsonify({"success": True, "data": structured_data}), 200
 
     except Exception as e:
-        print("\n🔥 ERROR LOG:", traceback.format_exc())  # ✅ Prints full traceback in console
+        print("\n ERROR LOG:", traceback.format_exc())
         return jsonify({"error": f"Server error: {str(e)}"}), 500
