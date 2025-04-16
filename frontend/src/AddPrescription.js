@@ -15,10 +15,9 @@ const AddPrescription = () => {
     last_taken: "",
   });
 
-  // ✅ Pre-fill form if redirected from ScanPrescription
   useEffect(() => {
     if (location.state && location.state.formData) {
-      console.log("✅ Received Data from Scan:", location.state.formData);
+      console.log(" Received Data from Scan:", location.state.formData);
       setFormData({ ...location.state.formData, last_taken: "" });
     }
   }, [location]);
@@ -41,7 +40,7 @@ const AddPrescription = () => {
       });
 
       if (response.data.success) {
-        console.log("✅ Prescription Added:", response.data);
+        console.log(" Prescription Added:", response.data);
         if (response.data.analysis) {
           localStorage.setItem("analysisMessage", response.data.analysis);
         }
