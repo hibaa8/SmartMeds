@@ -10,20 +10,20 @@ Features
 
 - AI-Powered Label Scanning: Extract prescription details using OCR.
 
-- Google Calendar Integration: Schedule medication reminders.
+- Gemma Medication Verfication: Gemma checks all the medications you are taking, informs you of possible side effects and ensure the medication is safe to take together.
 
 - Secure User Authentication: Signup and login with JWT authentication.
 
-- User-Friendly Dashboard: View and manage prescriptions easily.
-
-- Notification implemented (mostly complete)
+Features work in progress:
+- Google Calendar Integration: Schedule medication reminders.
+- Chat bot: Users can interact with a RAG-based chatbot to ask questions regarding their symptoms, over-the-counter medication, and prescriptions.  
 
 
 Tech Stack
 Frontend: React.js, Bootstrap
 Backend: Flask, Flask,, MongoDB
 APIs & Services: Google Vision API, Gemini, Gemma, Google OAuth, Google Calendar API
-OCR: Tesseract.js (for prescription label scanning)
+OCR: Tesseract.js
 
 Installation & Setup
 
@@ -43,11 +43,10 @@ pip install -r requirements.txt
 
 3. Configure Environment Variables
 ```
-#Create a .env file in the backend directory and set:
-SECRET_KEY=your_secret_key
+#update the config file with the following parameters:
 MONGO_URI=your_mongo_uri
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
+JWT_SECRET_KEY=""
+GOOGLE_VISION_CREDENTIALS_FILE=link_to_google_vision_key_json_file
 ```
 4. Run the Backend Server
 ```
