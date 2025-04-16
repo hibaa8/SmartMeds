@@ -1,14 +1,14 @@
-// src/pages/LandingPage.js
+
 import { Link } from "react-router-dom";
-import Navbar from "./components/Navbar"; // Import the Navbar
+import Navbar from "./components/Navbar"; 
 
 const LandingPage = () => {
   return (
     <div>
-      {/* Navbar */}
+
       <Navbar />
 
-      {/* Hero Section */}
+
       <header
         className="hero-section d-flex align-items-center text-center text-white"
         style={{
@@ -17,7 +17,7 @@ const LandingPage = () => {
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundBlendMode: "overlay",
-          backgroundColor: "black", // Soft blue overlay
+          backgroundColor: "black",
         }}
       >
         <div className="container">
@@ -31,7 +31,6 @@ const LandingPage = () => {
         </div>
       </header>
 
-      {/* About Section */}
       <section className="container text-center py-5">
         <h2 className="text-grey fw-bold mb-3 h3">Why Choose Smart Med Assistant?</h2>
         <p className="text-muted mx-auto w-75 h4">
@@ -40,7 +39,6 @@ const LandingPage = () => {
         </p>
       </section>
 
-      {/* Footer */}
       <footer className="bg-light text-center py-4">
         <p className="text-muted mb-0">&copy; {new Date().getFullYear()} Smart Med Assistant. All Rights Reserved.</p>
       </footer>
