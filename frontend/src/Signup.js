@@ -1,18 +1,18 @@
 import { useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "./context/AuthContext"; // Import AuthContext
-import Navbar from "./components/Navbar"; // Import Navbar
+import { AuthContext } from "./context/AuthContext"; 
+import Navbar from "./components/Navbar"; 
 
 const Signup = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    number: ""  // ✅ Ensure this is included
+    number: ""  /
   });
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext); // Get login function from context
+  const { login } = useContext(AuthContext); 
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -22,8 +22,8 @@ const Signup = () => {
     e.preventDefault();
     try {
       const res = await axios.post("/signup", formData);
-      login(res.data.token); // Store token in AuthContext
-      navigate("/medical-history", { state: { email: formData.email } }); // Redirect to medical history
+      login(res.data.token); 
+      navigate("/medical-history", { state: { email: formData.email } });
     } catch (error) {
       alert(error.response?.data?.error || "Signup failed. Please try again.");
     }
@@ -31,10 +31,8 @@ const Signup = () => {
 
   return (
     <div>
-      {/* Navbar */}
       <Navbar />
 
-      {/* Signup Form Section */}
       <div className="d-flex align-items-center justify-content-center vh-100 bg-light">
         <div className="card shadow-lg p-4" style={{ width: "400px" }}>
           <h2 className="text-center text-dark fw-bold mb-3">Sign Up</h2>
